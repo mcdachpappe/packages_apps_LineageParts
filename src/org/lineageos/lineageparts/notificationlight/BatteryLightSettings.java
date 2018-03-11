@@ -196,7 +196,7 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
             int reallyFullColor = LineageSettings.System.getInt(resolver, LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR,
                     res.getInteger(com.android.internal.R.integer.config_notificationsBatteryFullARGB));
             mReallyFullColorPref.setColor(reallyFullColor);
-            mReallyFullColorPref.setAllValues(reallyfullColor, 0, 0, false);
+            mReallyFullColorPref.setAllValues(reallyFullColor, 0, 0, false);
         }
     }
 
