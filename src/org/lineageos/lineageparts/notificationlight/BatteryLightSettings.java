@@ -45,6 +45,7 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
     private static final String LOW_COLOR_PREF = "low_color";
     private static final String MEDIUM_COLOR_PREF = "medium_color";
     private static final String FULL_COLOR_PREF = "full_color";
+    private static final String REALLY_FULL_COLOR_PREF = "really_full_color";
     private static final String LIGHT_ENABLED_PREF = "battery_light_enabled";
     private static final String PULSE_ENABLED_PREF = "battery_light_pulse";
     private static final String BRIGHTNESS_PREFERENCE = "battery_light_brightness_level";
@@ -54,6 +55,7 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
     private ApplicationLightPreference mLowColorPref;
     private ApplicationLightPreference mMediumColorPref;
     private ApplicationLightPreference mFullColorPref;
+    private ApplicationLightPreference mReallyFullColorPref;
     private LineageSystemSettingSwitchPreference mLightEnabledPref;
     private LineageSystemSettingSwitchPreference mPulseEnabledPref;
     private BatteryBrightnessPreference mBatteryBrightnessPref;
@@ -61,6 +63,7 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
     private int mDefaultLowColor;
     private int mDefaultMediumColor;
     private int mDefaultFullColor;
+    private int mDefaultReallyFullColor;
     private int mBatteryBrightness;
     private boolean mMultiColorLed;
 
@@ -112,6 +115,8 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
                     com.android.internal.R.integer.config_notificationsBatteryMediumARGB);
             mDefaultFullColor = res.getInteger(
                     com.android.internal.R.integer.config_notificationsBatteryFullARGB);
+            mDefaultReallyFullColor = res.getInteger(
+                    com.android.internal.R.integer.config_notificationsBatteryFullARGB);
 
             // Low, Medium and full color preferences
             mLowColorPref = (ApplicationLightPreference) prefSet.findPreference(LOW_COLOR_PREF);
@@ -129,6 +134,11 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
             mFullColorPref.setDefaultValues(mDefaultFullColor, 0, 0);
             mFullColorPref.setBrightness(mBatteryBrightness);
 
+            mReallyFullColorPref = (ApplicationLightPreference) prefSet.findPreference(REALLY_FULL_COLOR_PREF);
+            mReallyFullColorPref.setOnPreferenceChangeListener(this);
+            mReallyFullColorPref.setDefaultValues(mDefaultReallyFullColor, 0, 0);
+            mReallyFullColorPref.setBrightness(mBatteryBrightness);
+
             final BrightnessPreference.OnBrightnessChangedListener brightnessListener =
                     new BrightnessPreference.OnBrightnessChangedListener() {
                 @Override
@@ -136,6 +146,7 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
                     mLowColorPref.setBrightness(brightness);
                     mMediumColorPref.setBrightness(brightness);
                     mFullColorPref.setBrightness(brightness);
+                    mReallyFullColorPref.setBrightness(brightness);
                 }
             };
             mBatteryBrightnessPref.setOnBrightnessChangedListener(brightnessListener);
@@ -180,6 +191,13 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
             mFullColorPref.setAllValues(fullColor, 0, 0, false);
             updateBrightnessPrefColor(fullColor);
         }
+
+        if (mReallyFullColorPref != null) {
+            int reallyFullColor = LineageSettings.System.getInt(resolver, LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR,
+                    res.getInteger(com.android.internal.R.integer.config_notificationsBatteryFullARGB));
+            mReallyFullColorPref.setColor(reallyFullColor);
+            mReallyFullColorPref.setAllValues(reallyFullColor, 0, 0, false);
+        }
     }
 
     private void updateBrightnessPrefColor(int color) {
@@ -208,6 +226,8 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
         } else if (key.equals(FULL_COLOR_PREF)) {
             LineageSettings.System.putInt(resolver, LineageSettings.System.BATTERY_LIGHT_FULL_COLOR, color);
             updateBrightnessPrefColor(color);
+        } else if (key.equals(REALLY_FULL_COLOR_PREF)) {
+            LineageSettings.System.putInt(resolver, LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR, color);
         }
     }
 
@@ -242,6 +262,8 @@ public class BatteryLightSettings extends SettingsPreferenceFragment implements
                 mDefaultMediumColor);
         LineageSettings.System.putInt(resolver, LineageSettings.System.BATTERY_LIGHT_FULL_COLOR,
                 mDefaultFullColor);
+        LineageSettings.System.putInt(resolver, LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR,
+                mDefaultReallyFullColor);
         refreshColors();
     }
 
